@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Embedded Voice Chatbot</title>
+  <style>
+    #mic {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      text-align: center;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Parlez à l'assistant</h2>
+  <button id="mic">🎤 Appuyez pour parler</button>
+  <p id="output"></p>
+
+  <script>
+    const micButton = document.getElementById('mic');
+    const output = document.getElementById('output');
+
+    const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+
+    micButton.addEventListener('click', () => {
+      recognition.start();
+      output.textContent = "Écoute...";
+    });
+
+    recognition.addEventListener('result', (event) => {
+      const transcript = event.results[0][0].transcript;
+      output.textContent = "Vous avez dit : " + transcript;
+
+      // Simulated response logic (mocked, as Dialogflow needs API integration)
+      let response = "";
+
+      if (transcript.toLowerCase().includes("pharmacy")) {
+        response = "You can ask the pharmacist for help.";
+      } else if (transcript.toLowerCase().includes("appointment")) {
+        response = "You can say: I would like to make an appointment.";
+      } else {
+        response = "Sorry, I didn't understand. Try speaking more clearly.";
+      }
+
+      // Speak the response
+      const utterance = new SpeechSynthesisUtterance(response);
+      utterance.lang = "en-US";
+      speechSynthesis.speak(utterance);
+    });
+
+    recognition.addEventListener('error', (e) => {
+      output.textContent = "Erreur : " + e.error;
+    });
+  </script>
+</body>
+</html>
