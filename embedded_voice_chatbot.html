@@ -1,68 +1,44 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Embedded Voice Chatbot</title>
-  <style>
-    #mic {
-      background-color: #4CAF50;
-      border: none;
-      color: white;
-      padding: 12px 20px;
-      text-align: center;
-      font-size: 16px;
-      margin-top: 20px;
-      cursor: pointer;
-    }
-    #output {
-      margin-top: 20px;
-      font-size: 18px;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LinguaTest AI Chat</title>
 </head>
 <body>
-  <h2>Parlez à l'assistant</h2>
-  <button id="mic">🎤 Appuyez pour parler</button>
-  <p id="output"></p>
+  <h1>Voice Chatbot</h1>
+  <button onclick="startListening()">Start Talking</button>
+  <p id="userSpeech">You said: ...</p>
 
   <script>
-    const micButton = document.getElementById('mic');
-    const output = document.getElementById('output');
+    function startListening() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
 
-    const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-
-    micButton.addEventListener('click', () => {
       recognition.start();
-      output.textContent = "Écoute...";
-    });
 
-    recognition.addEventListener('result', (event) => {
-      const transcript = event.results[0][0].transcript;
-      output.textContent = "Vous avez dit : " + transcript;
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('userSpeech').innerText = 'You said: ' + transcript;
 
-      // Simulated response logic (mocked, as Dialogflow needs API integration)
-      let response = "";
+        // Simple response (example only)
+        let response = "Sorry, I didn't understand.";
+        if (transcript.toLowerCase().includes("hello")) {
+          response = "Hi! How can I help you today?";
+        } else if (transcript.toLowerCase().includes("thank you")) {
+          response = "You're welcome!";
+        }
 
-      if (transcript.toLowerCase().includes("pharmacy")) {
-        response = "You can ask the pharmacist for help.";
-      } else if (transcript.toLowerCase().includes("appointment")) {
-        response = "You can say: I would like to make an appointment.";
-      } else {
-        response = "Sorry, I didn't understand. Try speaking more clearly.";
-      }
+        const utterance = new SpeechSynthesisUtterance(response);
+        speechSynthesis.speak(utterance);
+      };
 
-      // Speak the response
-      const utterance = new SpeechSynthesisUtterance(response);
-      utterance.lang = "en-US";
-      speechSynthesis.speak(utterance);
-    });
-
-    recognition.addEventListener('error', (e) => {
-      output.textContent = "Erreur : " + e.error;
-    });
+      recognition.onerror = (event) => {
+        alert("Error occurred in recognition: " + event.error);
+      };
+    }
   </script>
 </body>
 </html>
